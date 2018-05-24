@@ -315,6 +315,18 @@ public class UsuariosDAO  implements OperacionesDAO {
 		// Nada que hacer si no hay persistencia.	
 	}
 	
+	//Equivalencias ID
+	
+	/**
+	 * Obtiene el id del usuario usado a partir de otro.
+	 * @param id
+	 * @return
+	 */
+	
+	public String obtenerEquivalencia (String id) {
+		return obtenerMapaEquivalencias().get(id);
+	}
+	
 	/**
 	 * Obtiene el mapa de equivalencias de id para idUsr.
 	 * @return el Hashtable almacenado
