@@ -4,13 +4,15 @@
  * Colabora en el patron Fachada.
  * @since: prototipo2.0
  * @source: PatronesDAO.java 
- * @version: 2.0 - 2018/04/20
- * @author: ajp
+ * @version: 2.1 - 2018/05/25
+ * @author: Alejandro
  */
 
 package accesoDatos.db4o;
 
 import java.util.ArrayList;
+
+import com.db4o.ObjectContainer;
 
 import accesoDatos.DatosException;
 import accesoDatos.OperacionesDAO;
@@ -20,6 +22,10 @@ public class PatronesDAO implements OperacionesDAO {
 
 	// Requerido por el Singleton 
 	private static PatronesDAO instancia = null;
+	
+	//Elemento donde almacenamos la base de datos db4o
+	
+	private ObjectContainer db;
 
 	// Elemento de almacenamiento. 
 	private static ArrayList<Patron> datosPatrones;
@@ -29,8 +35,15 @@ public class PatronesDAO implements OperacionesDAO {
 	 * Sólo se ejecutará una vez.
 	 */
 	private PatronesDAO() {
-		datosPatrones = new ArrayList<Patron>();
-		cargarPredeterminados();
+		db = Conexion.getDB();
+		try {
+			obtener("Demo0");
+		}
+		catch(DatosException e) {
+			cargarPredeterminados();
+		}
+		
+		
 	}
 
 	/**

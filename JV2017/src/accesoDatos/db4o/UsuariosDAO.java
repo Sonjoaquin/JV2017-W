@@ -5,8 +5,8 @@
  * Colabora en el patron Fachada.
  * @since: prototipo2.0
  * @source: UsuariosDAO.java 
- * @version: 2.0 - 2018/04/20 
- * @author: ajp
+ * @version: 2.1 - 2018/05/24 
+ * @author: Grupo 1: Alejandro, David, Francisco, Gonzalo
  */
 
 package accesoDatos.db4o;
@@ -189,32 +189,45 @@ public class UsuariosDAO  implements OperacionesDAO {
 			return;
 		}
 		
-			throw new DatosException("Alta: " + usrNuevo.getIdUsr() + " ya existe y es " + usrPrevio.getIdUsr());
+		try {
+			
+			generarVarianteIdUsr(usrNuevo, usrPrevio);
+			db.store(usrNuevo);
+			registrarEquivalenciaId(usrNuevo);
+		
 		}
-		
-		
-	
+		catch (DatosException e) {
+			throw new DatosException("Alta: " + usrNuevo.getIdUsr() + " ya existe y es " + usrPrevio.getIdUsr());
 
+		  }
+		
+		}
+	
 	/**
 	 *  Si hay coincidencia de identificador hace 23 intentos de variar la última letra
 	 *  procedente del NIF. Llama al generarVarianteIdUsr() de la clase Usuario.
 	 * @param usrNuevo
-	 * @param posicionInsercion
+	 * @param usrPrevio
 	 * @throws DatosException
 	 */
-	private int generarVarianteIdUsr(Usuario usrNuevo, int posicionInsercion) throws DatosException {
+	private void generarVarianteIdUsr(Usuario usrNuevo, Usuario usrPrevio) throws DatosException {
 		// Hay coincidencia de identificador con un usuario ya almacenado.
-		Usuario usrPrevio = datosUsuarios.get(posicionInsercion-1);
 		// Comprueba que no haya coincidencia de Correo y Nif
 		boolean condicion = !(usrNuevo.getCorreo().equals(usrPrevio.getCorreo())
 				|| usrNuevo.getNif().equals(usrPrevio.getNif()));
 		if (condicion) {
 			int intentos = "TRWAGMYFPDXBNJZSQVHLCKE".length();				// 24 letras
 			do {
-				usrNuevo.generarVarianteIdUsr();
-				posicionInsercion = obtenerPosicion(usrNuevo.getIdUsr());
-				if (posicionInsercion < 0) {
-					return posicionInsercion;
+				
+				try {
+					usrNuevo.generarVarianteIdUsr();
+					usrPrevio = obtener(usrNuevo.getIdUsr());
+
+				}
+				catch (DatosException e){
+					
+					return;
+					
 				}
 				intentos--;
 			} while (intentos > 0);
@@ -228,10 +241,13 @@ public class UsuariosDAO  implements OperacionesDAO {
 	 *	@param usr - Usuario a registrar equivalencias. 
 	 */
 	private void registrarEquivalenciaId(Usuario usr) {
-		assert usr != null;
-		equivalenciasId.put(usr.getIdUsr(), usr.getIdUsr());
-		equivalenciasId.put(usr.getNif().getTexto(), usr.getIdUsr());
-		equivalenciasId.put(usr.getCorreo().getTexto(), usr.getIdUsr());
+		Map<String,String> mapaEquivalencias = obtenerMapaEquivalencias();
+		
+		mapaEquivalencias.put(usr.getIdUsr(), usr.getIdUsr());
+		mapaEquivalencias.put(usr.getNif().getTexto(), usr.getIdUsr());
+		mapaEquivalencias.put(usr.getCorreo().getTexto(), usr.getIdUsr());
+		
+		db.store(mapaEquivalencias);
 	}
 
 	/**
@@ -338,5 +354,7 @@ public class UsuariosDAO  implements OperacionesDAO {
 		ObjectSet <Hashtable <String,String>> result = consulta.execute();
 		return result.get(0);
 	}
+	
+	
 
 } //class
