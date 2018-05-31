@@ -13,6 +13,8 @@ package accesoDatos.db4o;
 import java.util.ArrayList;
 
 import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
+import com.db4o.query.Query;
 
 import accesoDatos.DatosException;
 import accesoDatos.OperacionesDAO;
@@ -77,25 +79,25 @@ public class PatronesDAO implements OperacionesDAO {
 
 	//OPERACIONES DAO
 	/**
-	 * Búsqueda binaria de un Patron dado su nombre.
+	 * Obtiene un Patron.
 	 * @param nombre - el nombre del Patron a buscar.
 	 * @return - el Patron encontrado.
 	 * @throws DatosException - si no existe.
 	 */	
 	@Override
 	public Patron obtener(String nombre) throws DatosException {
-		if (nombre != null) {
-			int posicion = obtenerPosicion(nombre);				// En base 1
-			if (posicion >= 0) {
-				return datosPatrones.get(posicion - 1);     	// En base 0
+		ObjectSet<Patron> result;
+		Query consulta = db.query();
+		consulta.constrain(Patron.class);
+		consulta.descend("nombre").constrain(nombre).equal();
+		result = consulta.execute();
+		if(result.size() > 0) {
+			return result.get(0);
 			}
 			else {
 				throw new DatosException("Obtener: "+ nombre + " no existe");
 			}
 		}
-		return null;
-	}
-
 	/**
 	 *  Obtiene por búsqueda binaria, la posición que ocupa, o ocuparía,  un Patron en 
 	 *  la estructura.
