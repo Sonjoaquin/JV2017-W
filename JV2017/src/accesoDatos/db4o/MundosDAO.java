@@ -179,14 +179,18 @@ public class MundosDAO implements OperacionesDAO {
 	 * @throws DatosException - si no existe.
 	 */
 	@Override
-	public Mundo baja(String nombre) throws DatosException  {
-		assert (nombre != null);
-		int posicion = obtenerPosicion(nombre); 									// En base 1
-		if (posicion > 0) {
-			return datosMundos.remove(posicion - 1); 								// En base 0
+	public Mundo baja(String nombreMundo) throws DatosException  {
+		assert nombreMundo !=null;
+		assert nombreMundo !="";
+		assert nombreMundo !=" ";
+		Mundo mundo = null;
+		try {
+			mundo = obtener(nombreMundo);
+			db.delete(mundo);
+			return mundo;
 		}
-		else {
-			throw new DatosException("Baja: "+ nombre + " no existe");
+		catch (DatosException e){
+			throw new DatosException("Baja: "+ nombreMundo + " no existe");
 		}
 	}
 
