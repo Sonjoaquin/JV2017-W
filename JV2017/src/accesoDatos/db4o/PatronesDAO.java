@@ -158,6 +158,17 @@ public class PatronesDAO implements OperacionesDAO {
 		}
 
 	/**
+	 * Obtiene todos los objetos Patron
+	 * @return Retorna "List" con los objetos patron 
+	 */
+	public List<Patron> obtenerTodos(){
+		Query consulta=db.query();
+		consulta.constrain(Patron.class);
+		
+		return consulta.execute();
+	}
+	
+	/**
 	 * Elimina el objeto, dado el id utilizado para el almacenamiento.
 	 * @param nombre - el nombre del Patron a eliminar.
 	 * @return - el Patron eliminado. 
