@@ -181,17 +181,20 @@ public class PatronesDAO implements OperacionesDAO {
 	 *	@param obj - Patron con las modificaciones.
 	 *  @throws DatosException - si no existe.
 	 */
+	// ROCIO
 	@Override
 	public void actualizar(Object obj) throws DatosException  {
 		assert obj != null;
-		Patron patronActualizado = (Patron) obj;									// Para conversión cast
-		int posicion = obtenerPosicion(patronActualizado.getNombre()); 				// En base 1
-		if (posicion > 0) {
-			// Reemplaza elemento
-			datosPatrones.set(posicion - 1, patronActualizado);  					// En base 0	
+		Patron patron = (Patron) obj;	
+		Patron patronAux = null;
+		try {
+			patronAux = obtener(patron.getNombre());
+			patronAux.setNombre(patron.getNombre());
+			patronAux.setEsquema(patron.getEsquema());
+			db.store(patronAux);
 		}
-		else {
-			throw new DatosException("Actualizar: "+ patronActualizado.getNombre() + " no existe");
+		catch (DatosException e) {
+			throw new DatosException("Actualizar: "+ patro.getNombre() + " no existe");
 		}
 	}
 
