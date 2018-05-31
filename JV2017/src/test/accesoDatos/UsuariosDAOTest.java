@@ -3,8 +3,8 @@
  *  Clase JUnit 4 para pruebas del DAO de usuarios y la parte de la fachada de Datos correspondiente.
  *  @since: prototipo2.1
  *  @source: UsuariosDAO.java 
- *  @version: 2.1 - 2018/05/17 
- *  @author: ajp
+ *  @version: 2.1 - 2018/05/31 
+ *  @author: Gonzalo
  */
 
 package test.accesoDatos;
@@ -80,22 +80,55 @@ public class UsuariosDAOTest {
 
 	@Test
 	public void testObtenerUsuarioId() {
-		fail("No implenetado");
+		try {
+			assertEquals(fachada.obtenerUsuario("III1R").getIdUsr(), "III1R");
+	
+		}
+		catch (DatosException e) {
+			
+		}
 	}
 
 	@Test
 	public void testObtenerUsuario() {
-		fail("No implenetado");
+		try {
+			fachada.altaUsuario(usrPrueba);
+			//Busca el mismo usuario almacenado
+			assertSame (usrPrueba, fachada.obtenerUsuario(usrPrueba));
+			
+		}
+		catch (DatosException e) {
+			
+		}
 	}
 
 	@Test
-	public void testAltaUsuario() {
-		fail("No implenetado");
+	public void testAltaUsuario() {		
+		try {
+			//Usuario nuevo que no existe
+			fachada.altaUsuario(usrPrueba);
+			//Busca el mismo usuario almacenado
+			assertSame(usrPrueba, fachada.obtenerUsuario(usrPrueba));
+		}
+		catch (DatosException e) {
+			
+			
+		}
 	}
 
 	@Test
 	public void testBajaUsuario() {
-		fail("No implenetado");
+
+		try {
+			
+			fachada.altaUsuario(usrPrueba);
+			//Baja del mismo Usuario almacenado
+			assertSame(usrPrueba, fachada.obtenerUsuario(usrPrueba));
+		}
+		catch (DatosException e) {
+			
+		}
+	
 	}
 
 	@Test

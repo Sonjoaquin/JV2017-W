@@ -4,14 +4,19 @@
  * Colabora en el patron Fachada.
  * @since: prototipo2.0
  * @source: MundosDAO.java 
- * @version: 2.0 - 2018/04/20
- * @author: ajp
+ * @version: 2.1 - 2018/05/30
+ * @author: Grupo 3
  */
 
 package accesoDatos.db4o;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+
+import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
+import com.db4o.query.Query;
 
 import accesoDatos.DatosException;
 import accesoDatos.OperacionesDAO;
@@ -20,6 +25,10 @@ import modelo.Patron;
 import modelo.Posicion;
 
 public class MundosDAO implements OperacionesDAO {
+	
+	//Elemento de almacenamiento
+	//Base datos db4o
+	private ObjectContainer db;
 	
 	// Requerido por el patrón Singleton
 	private static MundosDAO instancia;
@@ -134,6 +143,16 @@ public class MundosDAO implements OperacionesDAO {
 	}
 	
 	/**
+	 * Obtiene todos los objetos Mundo almacenados
+	 * @return -la List con todos los mundos.
+	 */ 
+	public List<Mundo> obtenerTodos(){
+		Query consulta = db.query();
+		consulta.constrain(Mundo.class);
+		return consulta.execute();
+	}
+	
+	/**
 	 *  Alta de un objeto en el almacén de datos, 
 	 *  sin repeticiones, según el campo id previsto. 
 	 *	@param obj - Objeto a almacenar.
@@ -142,14 +161,15 @@ public class MundosDAO implements OperacionesDAO {
 	@Override
 	public void alta(Object obj) throws DatosException  {
 		assert obj != null;
-		Mundo mundoNuevo = (Mundo) obj;										// Para conversión cast
-		int posicionInsercion = obtenerPosicion(mundoNuevo.getNombre()); 
-		if (posicionInsercion < 0) {
-			datosMundos.add(-posicionInsercion - 1, mundoNuevo); 			// Inserta la sesión en orden.
-		}
-		else {
-			throw new DatosException("Alta: "+ mundoNuevo.getNombre() + " ya existe");
-		}
+        Mundo mundo = (Mundo)obj;
+        try{
+            obtener(mundo.getNombre());
+        }
+        catch (DatosException e){
+            db.store(mundo);
+            return;
+        }
+        throw new DatosException("Alta: " + mundo.getNombre() + "ya existe");
 	}
 
 	/**
@@ -159,14 +179,18 @@ public class MundosDAO implements OperacionesDAO {
 	 * @throws DatosException - si no existe.
 	 */
 	@Override
-	public Mundo baja(String nombre) throws DatosException  {
-		assert (nombre != null);
-		int posicion = obtenerPosicion(nombre); 									// En base 1
-		if (posicion > 0) {
-			return datosMundos.remove(posicion - 1); 								// En base 0
+	public Mundo baja(String nombreMundo) throws DatosException  {
+		assert nombreMundo !=null;
+		assert nombreMundo !="";
+		assert nombreMundo !=" ";
+		Mundo mundo = null;
+		try {
+			mundo = obtener(nombreMundo);
+			db.delete(mundo);
+			return mundo;
 		}
-		else {
-			throw new DatosException("Baja: "+ nombre + " no existe");
+		catch (DatosException e){
+			throw new DatosException("Baja: "+ nombreMundo + " no existe");
 		}
 	}
 
@@ -221,4 +245,27 @@ public class MundosDAO implements OperacionesDAO {
 		// Nada que hacer si no hay persistencia.	
 	}
 	
+	/**
+	 *  Obtiene un objeto mundo dado su nombre
+	 *	@param ID - nombre de Mundo a buscar.
+	 *	@return - Devuelve el objeto encontrado o null si no lo encuentra HECHO
+	 */
+
+	public Mundo obtenerMundo(String nombre) throws DatosException{
+
+		Query consulta = db.query();
+		consulta.constrain(Mundo.class);
+		consulta.descend("nombre").constrain(nombre).equal();
+		ObjectSet<Mundo> result = consulta.execute();
+		if (result.size()>0){
+			return result.get(0);
+		}
+		else{
+			throw new DatosException("Obtener: " + nombre + "no existe");
+		}
+		
+	
+
+    
+	}
 } // class

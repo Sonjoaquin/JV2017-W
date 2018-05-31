@@ -144,15 +144,16 @@ public class PatronesDAO implements OperacionesDAO {
 	@Override
 	public void alta(Object obj) throws DatosException  {
 		assert obj != null;
-		Patron patronNuevo = (Patron) obj;										// Para conversión cast
-		int posicionInsercion = obtenerPosicion(patronNuevo.getNombre()); 
-		if (posicionInsercion < 0) {
-			datosPatrones.add(-posicionInsercion - 1, patronNuevo); 			// Inserta la sesión en orden.
+		Patron patron = (Patron) obj;										
+		try {
+			obtener(patron.getNombre());
 		}
-		else {
-			throw new DatosException("Alta: "+ patronNuevo.getNombre() + " ya existe");
+		catch (DatosException e) {
+			db.store(patron);
+			return;
 		}
-	}
+			throw new DatosException("Alta: "+ patron.getNombre() + " ya existe");
+		}
 
 	/**
 	 * Elimina el objeto, dado el id utilizado para el almacenamiento.
@@ -161,33 +162,39 @@ public class PatronesDAO implements OperacionesDAO {
 	 * @throws DatosException - si no existe.
 	 */
 	@Override
-	public Patron baja(String nombre) throws DatosException  {
-		assert (nombre != null);
-		int posicion = obtenerPosicion(nombre); 									// En base 1
-		if (posicion > 0) {
-			return datosPatrones.remove(posicion - 1); 								// En base 0
-		}
-		else {
-			throw new DatosException("Baja: "+ nombre + " no existe");
-		}
+	public Patron baja(String nombrePatron) throws DatosException  {
+		assert nombrePatron != null;
+		assert nombrePatron != ""; 								
+		assert nombrePatron != " ";
+		Patron patron = null;
+			try {
+			patron = obtener(nombrePatron);
+				db.delete(patron);
+				return patron;
+				}
+			catch (DatosException e) {
+				throw new DatosException("Baja: " + nombrePatron + " no está dentro de la base de datos.");
+			}
 	}
-
 	/**
 	 *  Actualiza datos de un Mundo reemplazando el almacenado por el recibido.
 	 *	@param obj - Patron con las modificaciones.
 	 *  @throws DatosException - si no existe.
 	 */
+	// ROCIO
 	@Override
 	public void actualizar(Object obj) throws DatosException  {
 		assert obj != null;
-		Patron patronActualizado = (Patron) obj;									// Para conversión cast
-		int posicion = obtenerPosicion(patronActualizado.getNombre()); 				// En base 1
-		if (posicion > 0) {
-			// Reemplaza elemento
-			datosPatrones.set(posicion - 1, patronActualizado);  					// En base 0	
+		Patron patron = (Patron) obj;	
+		Patron patronAux = null;
+		try {
+			patronAux = obtener(patron.getNombre());
+			patronAux.setNombre(patron.getNombre());
+			patronAux.setEsquema(patron.getEsquema());
+			db.store(patronAux);
 		}
-		else {
-			throw new DatosException("Actualizar: "+ patronActualizado.getNombre() + " no existe");
+		catch (DatosException e) {
+			throw new DatosException("Actualizar: "+ patro.getNombre() + " no existe");
 		}
 	}
 
@@ -220,7 +227,7 @@ public class PatronesDAO implements OperacionesDAO {
 	 */
 	@Override
 	public void cerrar() {
-		// Nada que hacer si no hay persistencia.	
+		db.close();	
 	}
 	
 } //class

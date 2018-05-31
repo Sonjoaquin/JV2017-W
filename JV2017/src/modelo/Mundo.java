@@ -20,7 +20,7 @@ import java.util.Map.Entry;
 
 import config.Configuracion;
 
-public class Mundo implements Serializable {
+public class Mundo implements Serializable, Leyes {
 	
 	private static final long serialVersionUID = 1L;
 	private String nombre;
