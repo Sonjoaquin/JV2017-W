@@ -301,4 +301,16 @@ public class MundosDAO implements OperacionesDAO {
 		return texto.toString();
 
 	}
+	
+	/**
+	* Borrar todos los mundos almacenados en el sistema
+	*/
+
+	public void borrarTodosMundos(){
+
+	for ( Mundo mundos : obtenerTodos()){
+	db.delete(mundos);
+		}
+	}
+	
 } // class
