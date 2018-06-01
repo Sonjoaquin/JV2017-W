@@ -25,11 +25,11 @@ import modelo.Patron;
 import modelo.Posicion;
 
 public class MundosDAO implements OperacionesDAO {
-	
+
 	//Elemento de almacenamiento
 	//Base datos db4o
 	private ObjectContainer db;
-	
+
 	// Requerido por el patrón Singleton
 	private static MundosDAO instancia;
 
@@ -81,7 +81,7 @@ public class MundosDAO implements OperacionesDAO {
 		Mundo mundoDemo = new Mundo("MundoDemo", new ArrayList<Integer>(), new Hashtable<Patron,Posicion>());
 		datosMundos.add(mundoDemo);
 	}
-	
+
 	//OPERACIONES DAO
 	/**
 	 * Obtiene el objeto dado el id utilizado para el almacenamiento.
@@ -102,7 +102,7 @@ public class MundosDAO implements OperacionesDAO {
 		}
 		return null;
 	}
-	
+
 	/**
 	 *  Obtiene por búsqueda binaria, la posición que ocupa, o ocuparía,  un Mundo en 
 	 *  la estructura.
@@ -141,7 +141,7 @@ public class MundosDAO implements OperacionesDAO {
 	public Mundo obtener(Object obj) throws DatosException  {
 		return this.obtener(((Mundo) obj).getNombre());
 	}
-	
+
 	/**
 	 * Obtiene todos los objetos Mundo almacenados
 	 * @return -la List con todos los mundos.
@@ -151,7 +151,7 @@ public class MundosDAO implements OperacionesDAO {
 		consulta.constrain(Mundo.class);
 		return consulta.execute();
 	}
-	
+
 	/**
 	 *  Alta de un objeto en el almacén de datos, 
 	 *  sin repeticiones, según el campo id previsto. 
@@ -161,15 +161,15 @@ public class MundosDAO implements OperacionesDAO {
 	@Override
 	public void alta(Object obj) throws DatosException  {
 		assert obj != null;
-        Mundo mundo = (Mundo)obj;
-        try{
-            obtener(mundo.getNombre());
-        }
-        catch (DatosException e){
-            db.store(mundo);
-            return;
-        }
-        throw new DatosException("Alta: " + mundo.getNombre() + "ya existe");
+		Mundo mundo = (Mundo)obj;
+		try{
+			obtener(mundo.getNombre());
+		}
+		catch (DatosException e){
+			db.store(mundo);
+			return;
+		}
+		throw new DatosException("Alta: " + mundo.getNombre() + "ya existe");
 	}
 
 	/**
@@ -246,7 +246,7 @@ public class MundosDAO implements OperacionesDAO {
 	public void cerrar() {
 		// Nada que hacer si no hay persistencia.	
 	}
-	
+
 	/**
 	 *  Obtiene un objeto mundo dado su nombre
 	 *	@param ID - nombre de Mundo a buscar.
@@ -265,9 +265,21 @@ public class MundosDAO implements OperacionesDAO {
 		else{
 			throw new DatosException("Obtener: " + nombre + "no existe");
 		}
-		
-	
+	}
 
-    
+	/**
+	 * Devuelve todos los datos de todos los mundos
+	 */
+
+	public String toStringDatosMundos(){
+
+		StringBuilder texto = new StringBuilder();
+		Query consulta = db.query();
+		consulta.constrain(Mundo.class);
+		ObjectSet<Mundo> result = consulta.execute();
+		for (Mundo mundo : result){
+			texto.append("\n" + mundo);
+		}
+		return texto.toString();
 	}
 } // class
