@@ -65,18 +65,18 @@ public class MundosDAO implements OperacionesDAO {
 	private void cargarPredeterminados() {
 		// En este array los 0 indican celdas con célula muerta y los 1 vivas
 		byte[][] espacioDemo =  new byte[][]{ 
-			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //
-			{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //
-			{ 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0 }, //
-			{ 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, //
-			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 
-			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 
-			{ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 }, // 
-			{ 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0 }, //
-			{ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 }, // Given:
-			{ 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 1x Planeador
-			{ 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 1x Flip-Flop
-			{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }  // 1x Still Life
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //
+				{ 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, //
+				{ 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1, 0 }, //
+				{ 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0 }, //
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 
+				{ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 }, // 
+				{ 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0 }, //
+				{ 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 }, // Given:
+				{ 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 1x Planeador
+				{ 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, // 1x Flip-Flop
+				{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }  // 1x Still Life
 		};
 		Mundo mundoDemo = new Mundo("MundoDemo", new ArrayList<Integer>(), new Hashtable<Patron,Posicion>());
 		datosMundos.add(mundoDemo);
@@ -281,5 +281,24 @@ public class MundosDAO implements OperacionesDAO {
 			texto.append("\n" + mundo);
 		}
 		return texto.toString();
+	}
+
+	/**
+	 *  Devuelve los identificadores de los mundos 
+	 */
+
+	public String toStringIdMundos(){
+
+		StringBuilder texto = new StringBuilder();
+		Query consulta = db.query();
+		consulta.constrain(Mundo.class);
+		ObjectSet<Mundo> result = consulta.execute();
+		for (Mundo mundo : result){
+			if ( mundo != null){
+				texto.append(mundo.getNombre() + texto.append(System.getProperty("line.separator")));
+			}
+		}
+		return texto.toString();
+
 	}
 } // class
