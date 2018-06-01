@@ -202,14 +202,16 @@ public class MundosDAO implements OperacionesDAO {
 	@Override
 	public void actualizar(Object obj) throws DatosException  {
 		assert obj != null;
-		Mundo mundoActualizado = (Mundo) obj;										// Para conversión cast
-		int posicion = obtenerPosicion(mundoActualizado.getNombre()); 				// En base 1
-		if (posicion > 0) {
-			// Reemplaza elemento
-			datosMundos.set(posicion - 1, mundoActualizado);  						// En base 0		
+		Mundo mundo = ( Mundo) obj;
+		Mundo mundoActualizado = null;
+		try{
+			mundoActualizado = obtener(mundo.getNombre());
+			mundoActualizado.setConstantes(mundo.getConstantes());
+			mundoActualizado.setDistribucion(mundo.getDistribucion());
+			db.store(mundoActualizado);
 		}
-		else {
-			throw new DatosException("Actualizar: "+ mundoActualizado.getNombre() + " no existe");
+		catch (DatosException e){
+			throw new DatosException("Actualizar: " + mundo.getNombre() + " no existe.");
 		}
 	}
 
